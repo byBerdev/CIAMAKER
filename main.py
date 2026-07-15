@@ -4,138 +4,123 @@ from makeCia import make_cia
 import os
 
 
-class CiaMakerApp:
+class CiaMaker:
 
     def __init__(self, root):
         self.root = root
         self.root.title("CIAMAKER")
-        self.root.geometry("650x420")
+        self.root.geometry("600x400")
         self.root.resizable(False, False)
 
-        self.elf_file = ""
-        self.rsf_file = ""
+        self.elf = ""
+        self.rsf = ""
 
-        title = tk.Label(
+        tk.Label(
             root,
-            text="CIAMAKER\nA simple CIA Creator",
-            font=("Arial", 18, "bold")
-        )
-        title.pack(pady=15)
+            text="CIAMAKER",
+            font=("Arial", 22, "bold")
+        ).pack(pady=10)
+
+        tk.Label(
+            root,
+            text="A simple CIA file creator"
+        ).pack()
 
 
         # ELF
-        tk.Label(root, text="ELF File:").pack(anchor="w", padx=20)
-
-        self.elf_label = tk.Label(
-            root,
-            text="No file selected",
-            relief="sunken",
-            width=70
-        )
-        self.elf_label.pack(padx=20)
-
         tk.Button(
             root,
             text="Select ELF",
             command=self.select_elf
-        ).pack(pady=5)
+        ).pack(pady=10)
+
+        self.elf_label = tk.Label(
+            root,
+            text="ELF: Not selected"
+        )
+        self.elf_label.pack()
 
 
         # RSF
-        tk.Label(root, text="RSF File:").pack(anchor="w", padx=20)
-
-        self.rsf_label = tk.Label(
-            root,
-            text="No file selected",
-            relief="sunken",
-            width=70
-        )
-        self.rsf_label.pack(padx=20)
-
         tk.Button(
             root,
             text="Select RSF",
             command=self.select_rsf
-        ).pack(pady=5)
+        ).pack(pady=10)
+
+        self.rsf_label = tk.Label(
+            root,
+            text="RSF: Not selected"
+        )
+        self.rsf_label.pack()
 
 
-        # Output
-        tk.Label(root, text="Output CIA:").pack(anchor="w", padx=20)
-
-        self.output = tk.Entry(root, width=70)
-        self.output.insert(0, "output/app.cia")
-        self.output.pack(padx=20)
-
-
-        # Build
+        # Create
         tk.Button(
             root,
-            text="CREATE CIA",
+            text="BUILD CIA",
             font=("Arial", 12, "bold"),
-            command=self.create
+            command=self.build
         ).pack(pady=15)
 
 
         # Log
         self.log = tk.Text(
             root,
-            height=8
+            height=8,
+            width=70
         )
-        self.log.pack(
-            fill="both",
-            padx=20,
-            pady=5
-        )
+        self.log.pack(pady=10)
 
 
     def select_elf(self):
         file = filedialog.askopenfilename(
+            title="Choose ELF",
             filetypes=[
-                ("ELF Files", "*.elf"),
-                ("All Files", "*.*")
+                ("ELF file", "*.elf"),
+                ("All files", "*.*")
             ]
         )
 
         if file:
-            self.elf_file = file
-            self.elf_label.config(text=file)
+            self.elf = file
+            self.elf_label.config(
+                text="ELF: " + file
+            )
 
 
     def select_rsf(self):
         file = filedialog.askopenfilename(
+            title="Choose RSF",
             filetypes=[
-                ("RSF Files", "*.rsf"),
-                ("All Files", "*.*")
+                ("RSF file", "*.rsf"),
+                ("All files", "*.*")
             ]
         )
 
         if file:
-            self.rsf_file = file
-            self.rsf_label.config(text=file)
+            self.rsf = file
+            self.rsf_label.config(
+                text="RSF: " + file
+            )
 
 
-    def create(self):
+    def build(self):
 
-        if not self.elf_file or not self.rsf_file:
+        if not self.elf:
             messagebox.showerror(
                 "Error",
-                "Select ELF and RSF first."
+                "Select an ELF file first."
             )
             return
 
+        if not self.rsf:
+            messagebox.showerror(
+                "Error",
+                "Select an RSF file first."
+            )
+            return
 
-        output = self.output.get()
-
-        os.makedirs(
-            os.path.dirname(output),
-            exist_ok=True
-        )
-
-        success, msg = make_cia(
-            self.elf_file,
-            self.rsf_file,
-            output
-        )
 
         self.log.delete(
             "1.0",
@@ -144,17 +129,29 @@ class CiaMakerApp:
 
         self.log.insert(
             tk.END,
-            msg
+            "Building CIA...\n"
+        )
+
+        success, result = make_cia(
+            self.elf,
+            self.rsf
+        )
+
+        self.log.insert(
+            tk.END,
+            result
         )
 
 
         if success:
             messagebox.showinfo(
                 "CIAMAKER",
-                "CIA created!"
+                "CIA created in ELF folder!"
             )
 
 
 root = tk.Tk()
-app = CiaMakerApp(root)
+
+app = CiaMaker(root)
+
 root.mainloop()
