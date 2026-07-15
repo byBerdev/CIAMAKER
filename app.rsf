@@ -1,0 +1,21 @@
+BasicInfo:
+{
+    Title                   = "CIAMAKER APP";
+    CompanyCode             = "00";
+    ProductCode             = "CTR-HB01";
+    ContentType             = Application;
+    Logo                    = Nintendo;
+}
+
+TitleInfo:
+{
+    UniqueId                = 0x0ABCDE;
+}
+
+AccessControlInfo:
+{
+    FileSystemAccess:
+    {
+        Category            = Application;
+    }
+}
